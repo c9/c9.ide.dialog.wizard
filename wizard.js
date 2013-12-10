@@ -1,18 +1,17 @@
 define(function(require, module, exports) {
-    main.consumes = [
-        "Plugin", "ui", "Dialog"
-    ];
+    main.consumes = ["Plugin", "ui", "Dialog"];
     main.provides = ["Wizard", "WizardPage"];
     return main;
     
     function main(options, imports, register) {
+        var Plugin  = imports.Plugin;
         var Dialog  = imports.Dialog;
         var ui      = imports.ui;
         
         /***** Initialization *****/
         
         function Wizard(developer, deps, options){
-            var plugin = new Dialog("Ajax.org", main.consumes, {
+            var plugin = new Dialog(developer, deps.concat(main.consumes), {
                 name       : "dialog.wizard",
                 allowClose : false,
                 modal      : true,
@@ -26,7 +25,7 @@ define(function(require, module, exports) {
             });
             var emit = plugin.getEmitter();
             
-            var pages   = [];
+            var path    = [];
             var current = -1;
             var body;
             
@@ -38,7 +37,7 @@ define(function(require, module, exports) {
                 // CSS
                 ui.insertCss(require("text!./wizard.css"), plugin);
                 
-                body = options.aml;
+                body = options;
                 
                 plugin.update([
                     { id: "cancel", onclick: function(){ 
@@ -66,13 +65,22 @@ define(function(require, module, exports) {
             }
             
             function previous(){
-                activate(pages[current--]);
+                activate(path[current--]);
                 emit("previous");
             }
             
             function next(){
-                activate(pages[current++]);
-                emit("next");
+                var page;
+                if (current < path.length)
+                    page = path[++current];
+                else {
+                    page = emit("next", { 
+                        activePage: path[path.length - 1] 
+                    });
+                    current = path.push(page) - 1;
+                }
+                
+                activate(page);
             }
             
             function finish(){
@@ -80,18 +88,14 @@ define(function(require, module, exports) {
                 emit("finish");
             }
             
-            function add(page){
-                pages.push(page);
-            }
-            
             function activate(page){
-                var idx = pages.indexOf(page);
+                var idx = path.indexOf(page);
+                if (idx == -1) idx = path.length;
                 
                 plugin.update([
                     { id: "cancel", visible: page.cancel },
                     { id: "previous", visible: idx > 0 }, 
-                    { id: "next", visible: idx < pages.length - 1 && !page.last },
-                    { id: "finish", visible: page.finish }
+                    { id: "next", visible: !page.last }
                 ]);
                 
                 if (plugin.activePage)
@@ -106,8 +110,10 @@ define(function(require, module, exports) {
                 return plugin.queue(function(){
                     draw();
                 
-                    if (reset || current == -1)
-                        activate(pages[0]);
+                    if (reset || current == -1) {
+                        path = [];
+                        activate(startPage);
+                    }
                         
                 }, options.queue === false);
             }
@@ -129,7 +135,7 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                get activePage(){ return pages[current]; },
+                get activePage(){ return path[current]; },
                 
                 /**
                  * 
@@ -170,16 +176,81 @@ define(function(require, module, exports) {
             });
         }
         
-        function WizardPage(){
-            /*
-                last
-                cancel
-                finish
-            */
+        function WizardPage(options){
+            var plugin = new Plugin("Ajax.org", main.consumes);
+            var emit   = plugin.getEmitter();
+            
+            var name = options.name;
+            var last, cancel, finish;
+            
+            var drawn;
+            function draw(){
+                if (drawn) return;
+                drawn = true;
+                
+                container = document.createElement("div");
+                container.style.position = "absolute";
+                container.style.left     = 0;
+                container.style.right    = 0;
+                container.style.bottom   = 0;
+                container.style.top      = 0;
+                
+                emit("draw", { html: container }, true);
+            }
+            
+            /***** Methods *****/
+            
+            function hide(){
+                container.parentNode.removeChild(container);
+            }
+            
+            function show(options){
+                draw();
+                options.html.appendChild(container);
+            }
+            
+            /***** Register and define API *****/
+            
+            plugin.freezePublicAPI.baseclass();
+            
+            /**
+             * 
+             */
+            plugin.freezePublicAPI({
+                /**
+                 * 
+                 */
+                get name(){ return name; }),
+                
+                /**
+                 * 
+                 */
+                get last(){ return last; }),
+                set last(v){ last = v; }),
+                
+                /**
+                 * 
+                 */
+                get cancel(){ return cancel; }),
+                set cancel(v){ cancel = v; }),
+                
+                /**
+                 * 
+                 */
+                show: show,
+                
+                /**
+                 * 
+                 */
+                hide: hide
+            });
+            
+            return plugin;
         }
         
         register("", {
-            "Wizard" : Wizard
+            "Wizard" : Wizard,
+            "WizardPage" : WizardPage,
         });
     }
 });
