@@ -194,6 +194,9 @@ define(function(require, module, exports) {
                 drawn = true;
                 
                 container = document.createElement("div");
+                plugin.addOther(function(){
+                    container.parentNode.removeChild(container);
+                });
                 
                 emit("draw", { html: container }, true);
             }
