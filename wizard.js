@@ -47,7 +47,7 @@ define(function(require, module, exports) {
             
             function cancel(){
                 plugin.hide(); 
-                emit("cancel");
+                emit("cancel", { activePage: lastPage });
             }
             
             function previous(){
@@ -68,7 +68,7 @@ define(function(require, module, exports) {
             
             function finish(){
                 plugin.hide(); 
-                emit("finish");
+                emit("finish", { activePage: lastPage });
             }
             
             function activate(page){
