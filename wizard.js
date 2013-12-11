@@ -14,45 +14,31 @@ define(function(require, module, exports) {
             var plugin = new Dialog(developer, deps.concat(main.consumes), {
                 name       : "dialog.wizard",
                 allowClose : false,
+                title      : options.title,
                 modal      : true,
+                custom     : true,
                 elements   : [
-                    { type: "button", id: "cancel", caption: "Cancel", visible: false },
-                    { filler: true },
-                    { type: "button", id: "previous", caption: "Previous", visible: false },
-                    { type: "button", id: "next", caption: "Next", color: "green", "default": true },
-                    { type: "button", id: "finish", caption: "Finish", color: "green", visible: false }
+                    { type: "button", id: "cancel", caption: "Cancel", visible: false, onclick: cancel },
+                    { type: "filler" },
+                    { type: "button", id: "previous", caption: "Previous", visible: false, onclick: previous },
+                    { type: "button", id: "next", caption: "Next", color: "green", "default": true, onclick: next },
+                    { type: "button", id: "finish", caption: "Finish", visible: false, onclick: finish }
                 ]
             });
+            
             var emit = plugin.getEmitter();
             
             var path    = [];
             var current = -1;
-            var body;
+            var body, startPage, lastPage;
             
             var drawn = false;
             function draw(options){
                 if (drawn) return;
                 drawn = true;
                 
-                // CSS
-                ui.insertCss(require("text!./wizard.css"), plugin);
-                
-                body = options;
-                
-                plugin.update([
-                    { id: "cancel", onclick: function(){ 
-                        cancel();
-                    }},
-                    { id: "previous", onclick: function(){ 
-                        previous();
-                    }},
-                    { id: "next", onclick: function(){ 
-                        next();
-                    }},
-                    { id: "finish", onclick: function(){ 
-                        finish();
-                    }}
-                ]);
+                body = { html: document.createElement("div") };
+                var html = options.html.parentNode.replaceChild(body.html, options.html);
                 
                 emit("draw", null, true);
             }
@@ -65,20 +51,17 @@ define(function(require, module, exports) {
             }
             
             function previous(){
-                activate(path[current--]);
+                current--;
+                activate(path[current]);
                 emit("previous");
             }
             
             function next(){
-                var page;
-                if (current < path.length)
-                    page = path[++current];
-                else {
-                    page = emit("next", { 
-                        activePage: path[path.length - 1] 
-                    });
-                    current = path.push(page) - 1;
-                }
+                path.splice(current + 1);
+                var page = emit("next", { 
+                    activePage: path[path.length - 1] 
+                });
+                current = path.push(page) - 1;
                 
                 activate(page);
             }
@@ -90,17 +73,19 @@ define(function(require, module, exports) {
             
             function activate(page){
                 var idx = path.indexOf(page);
-                if (idx == -1) idx = path.length;
+                if (idx == -1) throw new Error();
                 
                 plugin.update([
-                    { id: "cancel", visible: page.cancel },
                     { id: "previous", visible: idx > 0 }, 
-                    { id: "next", visible: !page.last }
+                    { id: "next", visible: !page.last },
+                    { id: "finish", visible: page.last }
                 ]);
                 
-                if (plugin.activePage)
-                    plugin.activePage.hide();
+                if (lastPage)
+                    lastPage.hide();
                 page.show(body);
+                
+                lastPage = page;
             }
             
             function show(reset, options){
@@ -108,10 +93,9 @@ define(function(require, module, exports) {
                     options = {};
                 
                 return plugin.queue(function(){
-                    draw();
-                
                     if (reset || current == -1) {
-                        path = [];
+                        path    = [startPage];
+                        current = 0;
                         activate(startPage);
                     }
                         
@@ -120,8 +104,8 @@ define(function(require, module, exports) {
             
             /***** Lifecycle *****/
             
-            plugin.on("draw", function(){
-                draw();
+            plugin.on("draw", function(options){
+                draw(options);
             });
             
             /***** Register and define API *****/
@@ -138,12 +122,30 @@ define(function(require, module, exports) {
                 get activePage(){ return path[current]; },
                 
                 /**
+                 *
+                 */
+                get startPage(){ return startPage; },
+                set startPage(v){ startPage = v; },
+                
+                /**
                  * 
                  */
-                get finish(){ 
+                get showCancel(){ 
+                    return plugin.getElement("cancel").visible;
+                },
+                set showCancel(value){
+                    plugin.update([
+                        { id: "cancel", visible: value }
+                    ]);
+                },
+                
+                /**
+                 * 
+                 */
+                get showFinish(){ 
                     return plugin.getElement("finish").visible;
                 },
-                set finish(value){
+                set showFinish(value){
                     plugin.update([
                         { id: "finish", visible: value }
                     ]);
@@ -152,7 +154,7 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                show: show
+                show: show,
                 
                 /**
                  * 
@@ -174,6 +176,8 @@ define(function(require, module, exports) {
                  */
                 finish: finish
             });
+            
+            return plugin;
         }
         
         function WizardPage(options){
@@ -181,7 +185,8 @@ define(function(require, module, exports) {
             var emit   = plugin.getEmitter();
             
             var name = options.name;
-            var last, cancel, finish;
+            var last = options.last;
+            var container;
             
             var drawn;
             function draw(){
@@ -189,11 +194,6 @@ define(function(require, module, exports) {
                 drawn = true;
                 
                 container = document.createElement("div");
-                container.style.position = "absolute";
-                container.style.left     = 0;
-                container.style.right    = 0;
-                container.style.bottom   = 0;
-                container.style.top      = 0;
                 
                 emit("draw", { html: container }, true);
             }
@@ -220,19 +220,18 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                get name(){ return name; }),
+                get name(){ return name; },
                 
                 /**
                  * 
                  */
-                get last(){ return last; }),
-                set last(v){ last = v; }),
+                get container(){ return container; },
                 
                 /**
                  * 
                  */
-                get cancel(){ return cancel; }),
-                set cancel(v){ cancel = v; }),
+                get last(){ return last; },
+                set last(v){ last = v; },
                 
                 /**
                  * 
