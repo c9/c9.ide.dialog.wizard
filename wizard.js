@@ -38,9 +38,7 @@ define(function(require, module, exports) {
                 drawn = true;
                 
                 body = { html: document.createElement("div") };
-                var html = options.html.parentNode.replaceChild(body.html, options.html);
-                
-                emit("draw", null, true);
+                options.html.parentNode.replaceChild(body.html, options.html);
             }
             
             /***** Methods *****/
