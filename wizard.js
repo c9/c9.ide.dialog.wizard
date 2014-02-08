@@ -196,7 +196,7 @@ define(function(require, module, exports) {
                     container.parentNode.removeChild(container);
                 });
                 
-                emit("draw", { html: container }, true);
+                emit.sticky("draw", { html: container });
             }
             
             /***** Methods *****/
