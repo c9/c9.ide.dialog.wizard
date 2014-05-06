@@ -4,20 +4,20 @@ define(function(require, module, exports) {
     return main;
     
     function main(options, imports, register) {
-        var Plugin  = imports.Plugin;
-        var Dialog  = imports.Dialog;
-        var ui      = imports.ui;
+        var Plugin = imports.Plugin;
+        var Dialog = imports.Dialog;
+        var ui = imports.ui;
         
         /***** Initialization *****/
         
-        function Wizard(developer, deps, options){
+        function Wizard(developer, deps, options) {
             var plugin = new Dialog(developer, deps.concat(main.consumes), {
-                name       : "dialog.wizard",
-                allowClose : false,
-                title      : options.title,
-                modal      : true,
-                custom     : true,
-                elements   : [
+                name: "dialog.wizard",
+                allowClose: false,
+                title: options.title,
+                modal: true,
+                custom: true,
+                elements: [
                     { type: "button", id: "cancel", caption: "Cancel", visible: false, onclick: cancel },
                     { type: "filler" },
                     { type: "button", id: "previous", caption: "Previous", visible: false, onclick: previous },
@@ -28,12 +28,12 @@ define(function(require, module, exports) {
             
             var emit = plugin.getEmitter();
             
-            var path    = [];
+            var path = [];
             var current = -1;
             var body, startPage, lastPage;
             
             var drawn = false;
-            function draw(options){
+            function draw(options) {
                 if (drawn) return;
                 drawn = true;
                 
@@ -69,7 +69,7 @@ define(function(require, module, exports) {
                 emit("finish", { activePage: lastPage });
             }
             
-            function activate(page){
+            function activate(page) {
                 var idx = path.indexOf(page);
                 if (idx == -1) throw new Error();
                 
@@ -86,13 +86,13 @@ define(function(require, module, exports) {
                 lastPage = page;
             }
             
-            function show(reset, options){
+            function show(reset, options) {
                 if (!options)
                     options = {};
                 
                 return plugin.queue(function(){
                     if (reset || current == -1) {
-                        path    = [startPage];
+                        path = [startPage];
                         current = 0;
                         activate(startPage);
                     }
@@ -102,7 +102,7 @@ define(function(require, module, exports) {
             
             /***** Lifecycle *****/
             
-            plugin.on("draw", function(options){
+            plugin.on("draw", function(options) {
                 draw(options);
             });
             
@@ -131,7 +131,7 @@ define(function(require, module, exports) {
                 get showCancel(){ 
                     return plugin.getElement("cancel").visible;
                 },
-                set showCancel(value){
+                set showCancel(value) {
                     plugin.update([
                         { id: "cancel", visible: value }
                     ]);
@@ -143,7 +143,7 @@ define(function(require, module, exports) {
                 get showFinish(){ 
                     return plugin.getElement("finish").visible;
                 },
-                set showFinish(value){
+                set showFinish(value) {
                     plugin.update([
                         { id: "finish", visible: value }
                     ]);
@@ -178,9 +178,9 @@ define(function(require, module, exports) {
             return plugin;
         }
         
-        function WizardPage(options){
+        function WizardPage(options) {
             var plugin = new Plugin("Ajax.org", main.consumes);
-            var emit   = plugin.getEmitter();
+            var emit = plugin.getEmitter();
             
             var name = options.name;
             var last = options.last;
@@ -205,7 +205,7 @@ define(function(require, module, exports) {
                 container.parentNode.removeChild(container);
             }
             
-            function show(options){
+            function show(options) {
                 draw();
                 options.html.appendChild(container);
             }
