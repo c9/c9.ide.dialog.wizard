@@ -237,12 +237,6 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                get allowClose(){ return plugin.allowClose; },
-                set allowClose(v){ plugin.allowClose = v; },
-                
-                /**
-                 * 
-                 */
                 show: show,
                 
                 /**
