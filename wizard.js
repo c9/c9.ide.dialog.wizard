@@ -13,7 +13,7 @@ define(function(require, module, exports) {
         function Wizard(developer, deps, options) {
             var plugin = new Dialog(developer, deps.concat(main.consumes), {
                 name: "dialog.wizard",
-                allowClose: false,
+                allowClose: options.allowClose || false,
                 title: options.title,
                 modal: true,
                 custom: true,
@@ -233,6 +233,12 @@ define(function(require, module, exports) {
                  */
                 get last(){ return last; },
                 set last(v){ last = v; },
+                
+                /**
+                 * 
+                 */
+                get allowClose(){ return plugin.allowClose; },
+                set allowClose(v){ plugin.allowClose = v; },
                 
                 /**
                  * 
