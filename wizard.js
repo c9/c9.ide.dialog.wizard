@@ -51,7 +51,9 @@ define(function(require, module, exports) {
             function previous(){
                 current--;
                 activate(path[current]);
-                emit("previous");
+                emit("previous", {
+                    activePage: path[current]
+                });
             }
             
             function next(){
