@@ -9,14 +9,12 @@
         "url": "http://github.com/c9/c9.ide.dialog.wizard.git"
     },
     "plugins": {
-        "plugin": {
-            "wizard": {}
-        }
+        "wizard": {}
     },
     "categories": [
         "core"
     ],
     "licenses": [
-        ""
+        "MIT"
     ]
 }
