@@ -174,7 +174,12 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                finish: finish
+                finish: finish,
+                
+                /**
+                 * 
+                 */
+                gotoPage: activate
             });
             
             return plugin;
