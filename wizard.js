@@ -180,13 +180,16 @@ define(function(require, module, exports) {
             return plugin;
         }
         
-        function WizardPage(options) {
+        function WizardPage(options, forPlugin) {
             var plugin = new Plugin("Ajax.org", main.consumes);
             var emit = plugin.getEmitter();
             
             var name = options.name;
             var last = options.last;
             var container;
+            
+            if (forPlugin)
+                forPlugin.addOther(function(){ plugin.unload(); });
             
             var drawn;
             function draw(){
@@ -205,11 +208,13 @@ define(function(require, module, exports) {
             
             function hide(){
                 container.parentNode.removeChild(container);
+                emit("hide");
             }
             
             function show(options) {
                 draw();
                 options.html.appendChild(container);
+                emit("show");
             }
             
             /***** Register and define API *****/
