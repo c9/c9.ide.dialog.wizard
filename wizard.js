@@ -88,8 +88,7 @@ define(function(require, module, exports) {
                 if (!noButtons) {
                     plugin.update([
                         { id: "previous", visible: idx > 0 }, 
-                        { id: "next", visible: !page.last },
-                        { id: "finish", visible: page.last }
+                        { id: "next", visible: true }
                     ]);
                 }
                 
