@@ -14,6 +14,9 @@ define(function(require, module, exports) {
             var plugin = new Dialog(developer, deps.concat(main.consumes), {
                 name: "dialog.wizard",
                 allowClose: options.allowClose || false,
+                class: options.class,
+                height: options.height,
+                width: options.width,
                 title: options.title,
                 modal: true,
                 custom: true,
