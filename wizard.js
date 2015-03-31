@@ -17,6 +17,7 @@ define(function(require, module, exports) {
                 class: options.class,
                 height: options.height,
                 width: options.width,
+                resizable: options.resizable,
                 title: options.title,
                 modal: true,
                 custom: true,
@@ -61,12 +62,18 @@ define(function(require, module, exports) {
             
             function next(){
                 path.splice(current + 1);
+                
+                plugin.update([
+                    { id: "previous", visible: true }, 
+                    { id: "next", visible: true }
+                ]);
+                
                 var page = emit("next", { 
                     activePage: path[path.length - 1] 
                 });
                 current = path.push(page) - 1;
                 
-                activate(page);
+                activate(page, true);
             }
             
             function finish(){
@@ -74,15 +81,17 @@ define(function(require, module, exports) {
                 emit("finish", { activePage: lastPage });
             }
             
-            function activate(page) {
+            function activate(page, noButtons) {
                 var idx = path.indexOf(page);
                 if (idx == -1) throw new Error();
                 
-                plugin.update([
-                    { id: "previous", visible: idx > 0 }, 
-                    { id: "next", visible: !page.last },
-                    { id: "finish", visible: page.last }
-                ]);
+                if (!noButtons) {
+                    plugin.update([
+                        { id: "previous", visible: idx > 0 }, 
+                        { id: "next", visible: !page.last },
+                        { id: "finish", visible: page.last }
+                    ]);
+                }
                 
                 if (lastPage)
                     lastPage.hide();
@@ -130,6 +139,29 @@ define(function(require, module, exports) {
                 get startPage(){ return startPage; },
                 set startPage(v){ startPage = v; },
                 
+                /**
+                 * 
+                 */
+                get showPrevious(){ 
+                    return plugin.getElement("previous").visible;
+                },
+                set showPrevious(value) {
+                    plugin.update([
+                        { id: "previous", visible: value }
+                    ]);
+                },
+                
+                /**
+                 * 
+                 */
+                get showNext(){ 
+                    return plugin.getElement("next").visible;
+                },
+                set showNext(value) {
+                    plugin.update([
+                        { id: "next", visible: value }
+                    ]);
+                },
                 /**
                  * 
                  */
@@ -193,7 +225,6 @@ define(function(require, module, exports) {
             var emit = plugin.getEmitter();
             
             var name = options.name;
-            var last = options.last;
             var container;
             
             if (forPlugin)
@@ -242,12 +273,6 @@ define(function(require, module, exports) {
                  * 
                  */
                 get container(){ return container; },
-                
-                /**
-                 * 
-                 */
-                get last(){ return last; },
-                set last(v){ last = v; },
                 
                 /**
                  * 
