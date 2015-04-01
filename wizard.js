@@ -48,7 +48,6 @@ define(function(require, module, exports) {
             /***** Methods *****/
             
             function cancel(){
-                plugin.hide(); 
                 emit("cancel", { activePage: lastPage });
             }
             
@@ -73,6 +72,11 @@ define(function(require, module, exports) {
                 });
                 current = path.push(page) - 1;
                 
+                activate(page, true);
+            }
+            
+            function gotoPage(page){
+                current = path.push(page) - 1;
                 activate(page, true);
             }
             
@@ -213,7 +217,7 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                gotoPage: activate
+                gotoPage: gotoPage
             });
             
             return plugin;
