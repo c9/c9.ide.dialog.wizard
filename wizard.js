@@ -14,12 +14,12 @@ define(function(require, module, exports) {
             var plugin = new Dialog(developer, deps.concat(main.consumes), {
                 name: "dialog.wizard",
                 allowClose: options.allowClose || false,
-                class: options.class,
+                class: "wizard " + (options.class || ""),
                 height: options.height,
                 width: options.width,
                 resizable: options.resizable,
                 title: options.title,
-                modal: true,
+                modal: options.modal === undefined ? true : options.modal,
                 custom: true,
                 elements: [
                     { type: "button", id: "cancel", caption: "Cancel", visible: false, onclick: cancel },
