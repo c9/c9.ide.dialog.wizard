@@ -114,7 +114,7 @@ define(function(require, module, exports) {
                         activate(startPage);
                     }
                         
-                }, options.queue === false);
+                }, options.queue !== false);
             }
             
             /***** Lifecycle *****/
