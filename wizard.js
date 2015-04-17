@@ -103,10 +103,7 @@ define(function(require, module, exports) {
                 lastPage = page;
             }
             
-            function show(reset, options) {
-                if (!options)
-                    options = {};
-                
+            function show(reset) {
                 return plugin.queue(function(){
                     if (reset || current == -1) {
                         path = [startPage];
@@ -114,7 +111,7 @@ define(function(require, module, exports) {
                         activate(startPage);
                     }
                         
-                }, options.queue !== false);
+                }, true);
             }
             
             /***** Lifecycle *****/
