@@ -186,6 +186,25 @@ define(function(require, module, exports) {
                     ]);
                 },
                 
+                _events: [
+                    /**
+                     * @event cancel
+                     */
+                    "cancel",
+                    /**
+                     * @event previous
+                     */
+                    "previous",
+                    /**
+                     * @event next
+                     */
+                    "next",
+                    /**
+                     * @event finish
+                     */
+                    "finish"
+                ],
+                
                 /**
                  * 
                  */
@@ -273,6 +292,17 @@ define(function(require, module, exports) {
                  * 
                  */
                 get container(){ return container; },
+                
+                _events: [
+                    /**
+                     * @event hide
+                     */
+                    "hide",
+                    /**
+                     * @event show
+                     */
+                    "show"
+                ],
                 
                 /**
                  * 
