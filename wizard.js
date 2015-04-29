@@ -271,7 +271,7 @@ define(function(require, module, exports) {
             
             function show(options) {
                 draw();
-                options.html.appendChild(container);
+                options && options.html.appendChild(container);
                 emit("show");
             }
             
