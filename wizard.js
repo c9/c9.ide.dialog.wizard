@@ -47,11 +47,11 @@ define(function(require, module, exports) {
             
             /***** Methods *****/
             
-            function cancel(){
+            function cancel() {
                 emit("cancel", { activePage: lastPage });
             }
             
-            function previous(){
+            function previous() {
                 current--;
                 activate(path[current]);
                 emit("previous", {
@@ -59,7 +59,7 @@ define(function(require, module, exports) {
                 });
             }
             
-            function next(){
+            function next() {
                 path.splice(current + 1);
                 
                 plugin.update([
@@ -75,12 +75,12 @@ define(function(require, module, exports) {
                 activate(page, true);
             }
             
-            function gotoPage(page){
+            function gotoPage(page) {
                 current = path.push(page) - 1;
                 activate(page, true);
             }
             
-            function finish(){
+            function finish() {
                 plugin.hide(); 
                 emit("finish", { activePage: lastPage });
             }
@@ -104,7 +104,7 @@ define(function(require, module, exports) {
             }
             
             function show(reset) {
-                return plugin.queue(function(){
+                return plugin.queue(function() {
                     if (reset || current == -1) {
                         path = [startPage];
                         current = 0;
@@ -131,18 +131,18 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                get activePage(){ return path[current]; },
+                get activePage() { return path[current]; },
                 
                 /**
                  *
                  */
-                get startPage(){ return startPage; },
-                set startPage(v){ startPage = v; },
+                get startPage() { return startPage; },
+                set startPage(v) { startPage = v; },
                 
                 /**
                  * 
                  */
-                get showPrevious(){ 
+                get showPrevious() { 
                     return plugin.getElement("previous").visible;
                 },
                 set showPrevious(value) {
@@ -154,7 +154,7 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                get showNext(){ 
+                get showNext() { 
                     return plugin.getElement("next").visible;
                 },
                 set showNext(value) {
@@ -165,7 +165,7 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                get showCancel(){ 
+                get showCancel() { 
                     return plugin.getElement("cancel").visible;
                 },
                 set showCancel(value) {
@@ -177,7 +177,7 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                get showFinish(){ 
+                get showFinish() { 
                     return plugin.getElement("finish").visible;
                 },
                 set showFinish(value) {
@@ -247,15 +247,15 @@ define(function(require, module, exports) {
             var container;
             
             if (forPlugin)
-                forPlugin.addOther(function(){ plugin.unload(); });
+                forPlugin.addOther(function() { plugin.unload(); });
             
             var drawn;
-            function draw(){
+            function draw() {
                 if (drawn) return;
                 drawn = true;
                 
                 container = document.createElement("div");
-                plugin.addOther(function(){
+                plugin.addOther(function() {
                     container.parentNode.removeChild(container);
                 });
                 
@@ -264,7 +264,7 @@ define(function(require, module, exports) {
             
             /***** Methods *****/
             
-            function hide(){
+            function hide() {
                 container.parentNode.removeChild(container);
                 emit("hide");
             }
@@ -286,12 +286,12 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                get name(){ return name; },
+                get name() { return name; },
                 
                 /**
                  * 
                  */
-                get container(){ return container; },
+                get container() { return container; },
                 
                 _events: [
                     /**
@@ -319,8 +319,8 @@ define(function(require, module, exports) {
         }
         
         register("", {
-            "Wizard" : Wizard,
-            "WizardPage" : WizardPage,
+            "Wizard": Wizard,
+            "WizardPage": WizardPage,
         });
     }
 });
